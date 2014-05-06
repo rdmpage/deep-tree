@@ -154,7 +154,7 @@ echo '<!DOCTYPE html>
 		<body>
 			<h1>Deep tree viewer</h1>
 				<div>
-					<p>A simple Google Maps-inspired large tree viewer. Code on <a href="https://github.com/rdmpage/deep-tree">GitHub</a></p>
+					<p>A simple Google Maps-inspired large tree viewer. Code on <a href="https://github.com/rdmpage/deep-tree">GitHub</a>. Problems? Email me: <a href="mailto:rdmpage@gmail.com">rdmpage@gmail.com</a></p>
 					<p>Examples</p>';
 					
 					echo '<div style="height:100px;overflow:auto;width:200px;border:1px solid rgb(192,192,192);">';
