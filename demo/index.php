@@ -148,7 +148,7 @@ echo '<!DOCTYPE html>
 		<body>
 			<h1>Deep tree viewer</h1>
 				<div>
-					<p>A simple Google Maps-inspired large tree viewer.</p>
+					<p>A simple Google Maps-inspired large tree viewer. Code on <a href="https://github.com/rdmpage/deep-tree">GitHub</a></p>
 					<p>Examples</p>';
 					
 					echo '<div style="height:100px;overflow:auto;">';
@@ -164,6 +164,8 @@ echo '
 				
 				<div>
 					<h2>Upload a tree to display</h2>
+					
+					<p>For now tree must be NEXUS format and have branch lengths</p>
 					
 					<h3>Fetch tree from the web</h3>
 					
