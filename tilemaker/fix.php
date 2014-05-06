@@ -9,12 +9,23 @@ $id = '53690cd38fee9';
 
 $data = file_get_contents('../demo/tiles/' . $id . '.tre');
 
-$obj = parse_nexus($data);
+$treestring = '';
+
+// is it NEXUS?
+
+if (preg_match('/^#nexus/i', $data))
+{
+	$obj = parse_nexus($data);
+	
+	$treestring = $obj->tree->newick;
+}
+else
+{
+	$treestring = $data;
+}
 
 
-//echo $treestring;
-//exit();
 
-make_tiles($obj->tree->newick, '../demo/tiles', $id );
+make_tiles($treestring, '../demo/tiles', $id );
 
 ?>

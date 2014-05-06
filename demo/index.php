@@ -92,18 +92,24 @@ function main()
 		// read...
 		$data = file_get_contents($treefilename);
 		
+		$treestring = '';
+		
 		// is it NEXUS?
 		
-		
-		$obj = parse_nexus($data);
-	
-		//print_r($obj);
-		
-		// make tiles and tell where to get result....
+		if (preg_match('/^#nexus/i', $data))
+		{
+			$obj = parse_nexus($data);
+			
+			$treestring = $obj->tree->newick;
+		}
+		else
+		{
+			$treestring = $data;
+		}
 		
 		echo $tree_id;
 		
-		make_tiles($obj->tree->newick, TREEDIR, $tree_id);
+		make_tiles($treestring, TREEDIR, $tree_id);
 		
 		// clear out the output buffer
 		while (ob_get_status()) 
@@ -151,7 +157,7 @@ echo '<!DOCTYPE html>
 					<p>A simple Google Maps-inspired large tree viewer. Code on <a href="https://github.com/rdmpage/deep-tree">GitHub</a></p>
 					<p>Examples</p>';
 					
-					echo '<div style="height:100px;overflow:auto;">';
+					echo '<div style="height:100px;overflow:auto;width:200px;border:1px solid rgb(192,192,192);">';
 					foreach ($treelist as $t)
 					{
 						echo '<a href="show.php?id=' . $t . '">' . $t . '</a><br />';
@@ -165,7 +171,7 @@ echo '
 				<div>
 					<h2>Upload a tree to display</h2>
 					
-					<p>For now tree must be NEXUS format and have branch lengths</p>
+					<p>For now tree must be NEXUS or Newick format and have branch lengths</p>
 					
 					<h3>Fetch tree from the web</h3>
 					
