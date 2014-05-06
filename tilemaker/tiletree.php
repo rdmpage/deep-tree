@@ -263,8 +263,17 @@ function make_tiles ($treestring, $path, $treeid = '')
 	$attr['height'] 		= TILESIZE;
 	$attr['inset'] 			= FONTSIZE;
 	
-	//$td = new RectangleTreeDrawer($t, $attr);
-	$td = new PhylogramTreeDrawer($t, $attr);
+	// Untested
+	$td = null;
+	if ($t->HasBranchLengths())
+	{
+		$td = new PhylogramTreeDrawer($t, $attr);
+	}
+	else
+	{
+		$td = new RectangleTreeDrawer($t, $attr);
+	}
+	
 	$td->CalcCoordinates();
 	
 		{
@@ -473,8 +482,8 @@ function make_tiles ($treestring, $path, $treeid = '')
 								// Store label
 								$label = new stdclass;
 								$label->text = $subtree->label;
-								$label->top = $subtree->leftmost->GetAttribute('xy')['y'];
-								$label->bottom = $subtree->rightmost->GetAttribute('xy')['y'];
+								//$label->top = $subtree->leftmost->GetAttribute('xy')['y'];
+								//$label->bottom = $subtree->rightmost->GetAttribute('xy')['y'];
 								$label->h = $q->GetAttribute('left_span')/$t->GetNumLeaves() * 360;
 								$layer_labels[$zoom][] = $label;
 							}						
