@@ -149,8 +149,11 @@ function get_subtree ($p, $zoom = 0, $slice = 0)
 	// To do: note that generated label might not be unique (implications for searching tree)
 	$subtree->label = $p->GetLabel();
 	
-	// ignore internal labels for now
-	$subtree->label = '';
+	// if internal label is a number, it's probably just a bootstrap value, so ignore it
+	if (is_numeric($subtree->label))
+	{
+		$subtree->label = '';
+	}
 	
 	if ($subtree->label == '')
 	{
