@@ -481,6 +481,319 @@ class Tree
 		}
 						
 	}		
+	
+	
+	//----------------------------------------------------------------------------------------------
+	function ParseHarder ($treestring)
+	{
+		echo $treestring;
+	
+		// 1. tokenise 
+		
+		$n = strlen($treestring);
+		
+		$pos = 0;		
+		$buffer = '';
+		
+		$state = 0;
+		
+		$token = array();
+		
+		while ($state != 100)
+		{
+			if ($pos > $n)
+			{
+				$state = 100;
+			}
+		
+			switch ($state)
+			{
+				case 0: // get next token
+					switch ($treestring{$pos})
+					{
+						case '(':
+						case ')':
+						case ',':
+						case ';':
+						case ':':
+							$buffer = $treestring{$pos};
+							$pos++;
+							$state = 1;
+							break;
+							
+						// eat new lines
+						case "\r": 
+						case "\n": 
+							$pos++;
+							break;
+							
+						default:
+							$buffer = $treestring{$pos};
+							$pos++;
+							$state = 2;	
+							break;
+					}
+					break;
+					
+				case 1: // emit
+					
+					if (preg_match('/(?<label>.*):(?<edgelength>[\-]?\d+(\.\d+)?)$/', $buffer, $m))
+					{
+						$t = new stdclass;
+						$t->type = 'string';
+						$t->value = $m['label'];
+						$token[] = $t;
+						
+						$t = new stdclass;
+						$t->type = 'token';
+						$t->value = ':';
+						$token[] = $t;
+						
+						$t = new stdclass;
+						$t->type = 'number';
+						$t->value = $m['edgelength'];
+						$token[] = $t;
+					}
+					else
+					{
+						$t = new stdclass;
+						$t->type = 'token';
+						$t->value = $buffer;
+						$token[] = $t;
+					}
+					
+					$buffer = '';
+					$state = 0;
+					break;
+					
+				case 2: // extend token
+					switch ($treestring{$pos})
+					{
+						case ')':
+						case ',':
+							$state = 1;
+							break;
+							
+						case '[':
+							$pos++;
+							$state = 3;
+							break;
+							
+						default:
+							$buffer .= $treestring{$pos};
+							$pos++;
+							break;
+					}
+					break;	
+					
+				case 3: // eat comments
+					switch ($treestring{$pos})
+					{
+						case ']':
+							$pos++;
+							$state = 2;
+							break;
+												
+						default:
+							$pos++;
+							break;
+					}
+					break;	
+		
+				default:
+					break;
+			}
+		}
+		
+		// OK, now we have some pre-processed tokens
+		//print_r($token);
+		
+		//exit();
+		
+		
+		$curnode = $this->NewNode();
+		$this->root = $curnode;
+
+		$state = 0;
+		$stack = array();
+		$n = count($token);
+		
+		$i = 0;
+		while ($state != 99)
+		{
+		
+			//echo $state . ' '  . $token[$i]->type . ' ' . $token[$i]->value . "\n";
+			
+			switch ($state)
+			{
+				case 0: // getname
+					if ($token[$i]->type == 'string')
+					{
+						$this->num_leaves++;
+						$curnode->SetLabel($token[$i]->value);
+						$i++;
+						$state = 1;
+					}
+					else 
+					{
+						switch ($token[$i]->value)
+						{
+							case '(':
+								$state = 2;
+								break;
+							default:
+								$state = 99;
+								break;
+						}
+						
+					}
+					break;
+					
+				case 1: // getinternode
+					switch ($token[$i]->value)
+					{
+						case ':':
+						case ',':
+						case ')':
+							$state = 2;
+							break;
+						default:
+							$state = 99;
+							break;
+					}
+					break;
+					
+				case 2: // nextmove
+					switch ($token[$i]->value)
+					{
+						case ':':
+							$i++;
+							
+							if (is_numeric($token[$i]->value))
+							{
+								$curnode->SetAttribute('edge_length', $token[$i]->value);
+								$this->has_edge_lengths = true;
+								$i++;
+							}
+							break;
+						case ',':
+							$q = $this->NewNode();
+							$curnode->SetSibling($q);
+							$c = count($stack);
+							if ($c == 0)
+							{
+								$state = 99;
+							}
+							else
+							{
+								$q->SetAncestor($stack[$c - 1]);
+								$curnode = $q;
+								$state = 0;
+								$i++;
+							}
+							break;							
+						case '(':
+							$stack[] = $curnode;
+							$q = $this->NewNode();
+							$curnode->SetChild($q);
+							$q->SetAncestor($curnode);
+							$curnode = $q;
+							$state = 0;
+							$i++;
+							break;
+						case ')':
+							if (empty($stack))
+							{
+								$state = 99;
+							}
+							else
+							{
+								$curnode = array_pop($stack);
+								$state = 3;
+								$i++;
+							}
+							break;
+						
+						case ';':
+							if (empty($stack))
+							{
+								$state = 99;
+							}
+							else
+							{
+								$state = 99;
+							}
+							break;
+						
+						default:
+							$state = 99;
+							break;
+					}
+					break;
+				
+				case 3: // finishchildren
+					if ($token[$i]->type == 'string')
+					{
+						$curnode->SetLabel($token[$i]->value);
+						$i++;
+					}
+					else
+					{
+						switch ($token[$i]->value)
+						{
+							case ':':
+								$i++;
+								if (is_numeric($token[$i]->value))
+								{
+									$curnode->SetAttribute('edge_length', $token[$i]->value);
+									$this->has_edge_lengths = true;
+									$i++;
+								}
+								break;
+							case ')':
+								$c = count($stack);
+								if ($c == 0)
+								{
+									$state = 99;
+								}
+								else
+								{
+									$q = $stack[$c - 1];
+									$curnode = $q;
+									array_pop($stack);
+									$i++;
+								}
+								break;
+							case ',':
+								$q = $this->NewNode();
+								$curnode->SetSibling($q);
+								$c = count($stack);
+								if ($c == 0)
+								{
+									$state = 99;
+								}
+								else
+								{
+									$q->SetAncestor($stack[$c - 1]);
+									$curnode = $q;
+									$state = 0;
+									$i++;
+								}
+								break;
+							case ';':
+								$state = 2;
+								break;
+							default:
+								$state = 99;
+								break;
+						}
+					}
+					break;
+			}
+		}
+						
+	}			
+			
 						
 	//----------------------------------------------------------------------------------------------
 	function Dump()
