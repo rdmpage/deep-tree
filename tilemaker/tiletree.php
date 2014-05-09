@@ -211,12 +211,19 @@ function get_subtree ($p, $zoom = 0, $slice = 0)
 
 
 //--------------------------------------------------------------------------------------------------
-function make_tiles ($treestring, $path, $treeid = '')
+function make_tiles ($treestring, $path, $format='newick', $treeid = '')
 {
 	//----------------------------------------------------------------------------------------------
 	// Parse tree and make it pretty by ordering it
 	$t = new Tree();
-	$t->Parse($treestring);
+	if ($format == 'newick')
+	{
+		$t->ParseHarder($treestring);
+	}
+	else
+	{
+		$t->Parse($treestring);	
+	}
 	$t->BuildWeights($t->GetRoot());
 	
 	

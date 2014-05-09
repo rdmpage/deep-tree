@@ -96,11 +96,16 @@ function main()
 		
 		// is it NEXUS?
 		
+		$format = 'newick';
+		
 		if (preg_match('/^#nexus/i', $data))
 		{
+			$format = 'nexus';
 			$obj = parse_nexus($data);
 			
 			$treestring = $obj->tree->newick;
+			
+			
 		}
 		else
 		{
@@ -109,7 +114,7 @@ function main()
 		
 		echo $tree_id;
 		
-		make_tiles($treestring, TREEDIR, $tree_id);
+		make_tiles($treestring, TREEDIR, $format, $tree_id);
 		
 		// clear out the output buffer
 		while (ob_get_status()) 
