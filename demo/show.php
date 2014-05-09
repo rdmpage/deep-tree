@@ -128,7 +128,7 @@ var Viewer = {
 	count: 0,
 	width: 0,
 	height: 0,
-	zoomLevel: 1,
+	zoomLevel: 0,
 	maxZoomLevel: <?php echo $max_zoom; ?>,
 	tileSize: 512,
 	fullSize: 0,
