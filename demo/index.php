@@ -94,6 +94,8 @@ function main()
 		
 		$treestring = '';
 		
+		$translate = array();
+		
 		// is it NEXUS?
 		
 		$format = 'newick';
@@ -105,6 +107,13 @@ function main()
 			
 			$treestring = $obj->tree->newick;
 			
+			// handle translation table...
+			
+			if (isset($obj->translations))
+			{
+				$translate = $obj->translations->translate;
+			}
+			
 			
 		}
 		else
@@ -114,7 +123,7 @@ function main()
 		
 		echo $tree_id;
 		
-		make_tiles($treestring, TREEDIR, $format, $tree_id);
+		make_tiles($treestring, TREEDIR, $format, $tree_id, $translate);
 		
 		// clear out the output buffer
 		while (ob_get_status()) 

@@ -8,6 +8,8 @@ require_once (dirname(__FILE__) . '/hsl.php');
 define('TILESIZE', 512);
 define('FONTSIZE', 10);
 
+define('MAXLABELENGTH', 40);
+
 define('ZEBRA', 0); // make zebra lines
 
 //--------------------------------------------------------------------------------------------------
@@ -211,7 +213,7 @@ function get_subtree ($p, $zoom = 0, $slice = 0)
 
 
 //--------------------------------------------------------------------------------------------------
-function make_tiles ($treestring, $path, $format='newick', $treeid = '')
+function make_tiles ($treestring, $path, $format='newick', $treeid = '', $translate = array())
 {
 	//----------------------------------------------------------------------------------------------
 	// Parse tree and make it pretty by ordering it
@@ -222,7 +224,27 @@ function make_tiles ($treestring, $path, $format='newick', $treeid = '')
 	}
 	else
 	{
+		// nexus
 		$t->Parse($treestring);	
+		
+		if (count($translate) > 0)
+		{
+			$pi = new NodeIterator($t->getRoot());
+			$q = $pi->Begin();
+			while ($q != NULL)
+			{	
+				if ($q->IsLeaf())
+				{
+					$q->SetLabel($translate[$q->GetLabel()]);
+				}
+				$q = $pi->Next();
+			}	
+		}
+				
+		
+		
+		
+		
 	}
 	$t->BuildWeights($t->GetRoot());
 	
@@ -575,7 +597,16 @@ function make_tiles ($treestring, $path, $format='newick', $treeid = '')
 									
 									$labelpt = $a;
 									$labelpt['x'] += FONTSIZE/2.0;
-									$p->DrawText($labelpt, $q->Getlabel()); 
+									
+									$label = $q->Getlabel();
+									$len = strlen($label);
+									if ($len > MAXLABELENGTH)
+									{
+										$label = substr($label, 0, MAXLABELENGTH) . '…';
+									}
+									
+									
+									$p->DrawText($labelpt, $label); 
 								}
 							}
 							else
