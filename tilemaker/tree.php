@@ -274,7 +274,7 @@ class Tree
 		$n = count($token);
 		
 		$i = 1;
-		while ($state != 99)
+		while ($state < 99) // 99 is error, 100 is done
 		{
 			switch ($state)
 			{
@@ -395,22 +395,12 @@ class Tree
 						case ';':
 							if (empty($stack))
 							{
-								$state = 99;
+								$state = 100;
 							}
 							else
 							{
 								$state = 99;
 							}
-							/*
-							$c = count($stack);
-							if ($c == 0)
-							{
-								$state = 99;
-							}
-							else
-							{
-								$state = 99;
-							} */
 							break;
 						
 						default:
@@ -479,6 +469,8 @@ class Tree
 					break;
 			}
 		}
+		
+		return $state;
 						
 	}		
 	
@@ -486,7 +478,7 @@ class Tree
 	//----------------------------------------------------------------------------------------------
 	function ParseHarder ($treestring)
 	{
-		echo $treestring;
+		//echo $treestring;
 	
 		// 1. tokenise 
 		
@@ -499,11 +491,11 @@ class Tree
 		
 		$token = array();
 		
-		while ($state != 100)
+		while ($state < 99) // 99 error, 100 done
 		{
 			if ($pos > $n)
 			{
-				$state = 100;
+				$state = 99;
 			}
 		
 			switch ($state)
@@ -619,7 +611,7 @@ class Tree
 		$n = count($token);
 		
 		$i = 0;
-		while ($state != 99)
+		while ($state < 99) // 99 error, 100 done
 		{
 		
 			//echo $state . ' '  . $token[$i]->type . ' ' . $token[$i]->value . "\n";
@@ -717,7 +709,7 @@ class Tree
 						case ';':
 							if (empty($stack))
 							{
-								$state = 99;
+								$state = 100;
 							}
 							else
 							{
@@ -791,6 +783,8 @@ class Tree
 					break;
 			}
 		}
+		
+		return $state;
 						
 	}			
 			
