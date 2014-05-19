@@ -479,6 +479,7 @@ function parse_nexus($str)
 	//echo "$blockname\n";
 	
 	$treeblock = new stdclass;
+	//$treeblock->error = NexusError::ok;
 	
 	
 	if ($blockname == 'taxa')
@@ -667,6 +668,10 @@ function parse_nexus($str)
 	}
 	
 	//echo "Error=" . $nx->error . "\n";
+	
+	//$treeblock->error = $nx->error;
+
+	
 	return $treeblock;
 }
 
