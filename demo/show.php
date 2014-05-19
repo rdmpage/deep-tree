@@ -22,6 +22,7 @@ if (isset($_GET['id']))
 		{
 			$max_zoom++;
 		}
+		$max_zoom--;
 	}
 }
 
@@ -85,6 +86,10 @@ body {
 #surface {
 	z-index: 20;
 	_background: url(images/blank.gif) no-repeat center center; /* NOTE: required for IE to"see" the surface */
+	
+	cursor: -webkit-grab;
+	cursor: -moz-grab;
+	
 }
 
 #well {
